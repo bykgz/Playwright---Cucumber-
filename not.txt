@@ -1,0 +1,477 @@
+gereksiz dosyaları kaldırdık , cucumber kullanacağımız için 
+playwright.config , test , utils vs 
+
+
+
+
+npm init playwright@latest  --> playwright kurulumu 
+
+npm install @cucumber/cucumber -D  --> diyerek cucumberi kurduk 
+
+npm install ts-node -D  -->
+
+
+
+
+
+************* settinde cucumber yazıp setting.json dosyanına , kendi dosya yolumuzu eklememiz gerek  !!!!! önemli 
+
+  "cucumber.glue": [
+    "src/test/steps/**/*.ts", //bu satırı ekledik 
+    "*specs*/**/*.cs",
+    "features/**/*.js",
+    "features/**/*.jsx",
+    "features/**/*.php",
+    "features/**/*.py",
+    "features/**/*.rs",
+    "features/**/*.rb",
+    "features/**/*.ts",
+    "features/**/*.tsx",
+    "features/**/*_test.go",
+    "src/test/**/*.java",
+    "tests/**/*.py",
+    "tests/**/*.rs"
+  ],
+  "cucumber.features": [
+    "src/test/**/*.feature",
+    "features/**/*.feature",
+    "tests/**/*.feature",
+    "*specs*/**/*.feature"
+  ],
+  "cucumber.parameterTypes": []
+
+************************************
+
+
+cucumber.json dosyası ====> 
+
+
+{
+  "default": {
+    "formatOptions": {
+      "snippetInterface": "async-await"     --> metodlarımız asenkron olarak tanımlanmalı , bu yüzden bunu metodlarımıza eklesin diye bunu yaptık 
+                                                ama gerek olmayabilir çünkü eklenti de aynı işi yapıyor sanırım
+    },
+    "paths": ["src/test/features"],       ---> features altındaki herşeyi çalıştırır
+    "dryRun": false,                          --> true olursa testleri koşmaz eksik dosyaları tarar
+    "require": ["src/test/steps/**/*.ts"],    --> burda step dosyamızın yolunu tanımlıyoruz (seleniumdaki glue gibi)
+                                                eğer steps klasörü altınd alt klasörler oluşturacaksak burda bu şekilde  
+                                                steps/**/*.ts  --> stepsin altında herhangi isimde bir klasör ve harhangi bir isimde ts dosyası
+                                             
+    "requireModule": ["ts-node/register"]   --->  "requireModule": ["ts-node/register"] ifadesi, 
+                                                  TypeScript dosyalarını doğrudan çalıştırabilme yeteneği sağlar.
+                                                  cucumber TypeScript i doğrudan desteklemediği için gerekli 
+  }
+}
+
+
+
+/*
+Normalde, Node.js yalnızca JavaScript dosyalarını doğrudan çalıştırabilir. 
+TypeScript dosyaları, Node.js tarafından anlaşılabilecek JavaScript'e önceden derlenmelidir.
+ Ancak, ts-node modülü, TypeScript dosyalarını doğrudan çalıştırabilme yeteneği sağlar. 
+ Bu, geliştirme sürecini hızlandırabilir çünkü TypeScript dosyalarını her değişiklikten sonra yeniden derlemeye gerek kalmaz.
+
+"requireModule": ["ts-node/register"] ifadesi, test çerçevenizin ts-node modülünü kullanarak TypeScript dosyalarını doğrudan çalıştırmasını sağlar. 
+Bu, genellikle TypeScript ile yazılmış testler için gereklidir.
+
+
+Ancak, bazı test çerçeveleri veya çalışma ortamları (örneğin Cucumber) TypeScript'i doğrudan desteklemez. 
+Bu durumda, TypeScript dosyalarını JavaScript'e dönüştürmek için ts-node'a ihtiyaç duyulur. 
+Bu, "requireModule": ["ts-node/register"] ifadesinin neden gerektiğini açıklar.
+
+
+
+
+Cucumber, bir Behavior-Driven Development (BDD) Framework dür.
+ BDD, yazılımın işlevselliğini belirli bir davranışa dayalı olarak belgelemek ve test etmek için kullanılan bir yaklaşımdır. 
+ Cucumber, bu davranışları belirtmek ve otomatik testler olarak çalıştırmak için kullanılır. 
+ Cucumber, testlerinizi doğal dil benzeri bir sözdizimi kullanarak yazmanıza olanak sağlar.
+
+Playwright ise, tarayıcı otomasyonu için bir araçtır.
+Playwright, modern web uygulamalarını test etmek için kullanılır. 
+Playwright, birden çok tarayıcıda (Chrome, Firefox, Safari vb.) otomatik testler çalıştırabilir.
+Bu iki araç genellikle birlikte kullanılır. 
+Cucumber, testlerinizi belirtmek ve organize etmek için kullanılırken, Playwright, bu testleri tarayıcıda otomatik olarak çalıştırmak için kullanılır.
+*/
+
+
+
+
+
+
+
+
+************************************
+
+npm install ts-node -D komutu, Node.js projelerinde TypeScript kodunu doğrudan çalıştırmak için kullanılan ts-node paketini geliştirme bağımlılığı olarak yükler.
+Bu komutun parçalarını ayrı ayrı inceleyelim:
+npm install: Bu komut, belirtilen paketi Node.js projesine yükler. 
+Bu paket, proje için bir bağımlılık olur ve projenin çalışması için gerekli olabilir.
+ts-node: Bu, yüklemek istediğimiz paketin adıdır.
+ts-node bir Node.js paketidir ve TypeScript kodunu doğrudan çalıştırmak için kullanılır.
+Normalde, TypeScript kodu önce JavaScript koduna dönüştürülür ve sonra bu JavaScript kodu çalıştırılır. 
+Ancak ts-node ile TypeScript kodunu doğrudan çalıştırabiliriz, bu da geliştirme sürecini hızlandırır.
+
+-D: Bu seçenek, paketin bir geliştirme bağımlılığı olarak yüklenmesini sağlar. 
+Geliştirme bağımlılıkları, projenin çalışması için gerekli olmayan ancak geliştirme sürecinde yardımcı olan paketlerdir. 
+Örneğin, test çerçeveleri veya kod biçimlendiriciler geliştirme bağımlılıkları olabilir. 
+Bu paketler, projenin üretim versiyonunda genellikle gerekli değildir. Bu yüzden bu paketler, geliştirme bağımlılıkları olarak yüklenir.
+
+
+************************************
+
+cucumber.json dosyası oluşturduk -->  cucumberla ilgili tüm ayarlamaları bu config dosyası içerisinde düzenleyeceğiz
+
+package.json dosyasına script ekledik --> "test": "cucumber-js test"
+artık testlerimizi "npm test"  yazarak koşmamızı sağlayacak
+
+ *********************************
+
+Background: her testen önce çalışan kısım , before each gibi çalışıyor
+
+
+Feature : Login testleri --->  bir suit belirtiyoruz , nelerin testini yapacağız ? 
+    Scenario: Geçerli verilerle login olabilmeliyim - Case 01 --------> buda bizim test seneryomuz 
+       GİVEN : bir hazırkık yapıldığı durumlarda kullanılır 
+       WHEN :  bir eylem gerçekleşeceği durumlarda kullanılır
+       THEN : bir doğrulama gerçekleşeceği durumlarda kullanılır
+       AND : aralarda bailaç olarak 
+
+
+
+*******************************************************
+
+Bu JSON dosyası, Cucumber test çerçevesinin yapılandırma ayarlarını içerir. Her bir özellik aşağıda açıklanmıştır:
+
+"paths": ["src/test/features"]: Bu ayar, Cucumber'ın hangi klasörlerdeki .feature dosyalarını çalıştıracağını belirtir. Bu örnekte, Cucumber src/test/features klasöründeki tüm .feature dosyalarını çalıştıracaktır.
+
+
+"format": ["progress"]: 
+
+
+"tags": ["~@ignore"]: Bu ayar, hangi etiketlere sahip testlerin çalıştırılacağını veya çalıştırılmayacağını belirtir. Bu örnekte, @ignore etiketine sahip testler çalıştırılmayacaktır.
+
+"profile": false: Bu ayar, Cucumber'ın hangi profili kullanacağını belirtir. Bu örnekte, profil kullanılmayacaktır.
+
+"dry-run": false: Bu ayar, Cucumber'ın testleri gerçekten çalıştırıp çalıştırmayacağını belirtir. dry-run modunda, Cucumber testleri gerçekten çalıştırmaz, sadece testlerin tanımlarını kontrol eder. Bu örnekte, dry-run modu kapalıdır, yani testler gerçekten çalıştırılacaktır.
+
+"strict": false: Bu ayar, Cucumber'ın testlerin başarısız olması durumunda nasıl davranacağını belirtir. strict modda, Cucumber bir test başarısız olduğunda hemen durur. Bu örnekte, strict modu kapalıdır, yani bir test başarısız olsa bile Cucumber diğer testlere devam edecektir.
+
+"parallel": 1: Bu ayar, Cucumber'ın kaç testi aynı anda çalıştıracağını belirtir. Bu örnekte, Cucumber bir seferde sadece bir test çalıştıracaktır.
+
+"require": ["steps/*"]: Bu ayar, Cucumber'ın hangi dosyaları veya klasörleri gerektireceğini belirtir. Bu dosyalar genellikle adım tanımlarını içerir.
+
+
+"fail-fast": true: Bu ayar, bir test başarısız olduğunda Cucumber'ın hemen durmasını sağlar.
+
+"snippets": true: Bu ayar, Cucumber'ın tanımlanmamış adımlar için kod parçacıkları oluşturmasını sağlar.
+
+"timeout": 5000: Bu ayar, her bir adımın maksimum çalışma süresini milisaniye cinsinden belirtir.
+
+"worldParameters": { "param1": "value1", "param2": "value2" }: Bu ayar, Cucumber'ın World nesnesine ekstra parametreler eklemenizi sağlar. Bu parametreler, adımlarınızın içinde this.parameters.param1 gibi bir şekilde erişilebilir.
+
+"order": "defined": Bu ayar, testlerin çalıştırılma sırasını belirler. defined değeri, testlerin .feature dosyalarında tanımlandığı sırayla çalıştırılacağı anlamına gelir.
+
+"name": ["name1", "name2"]: Bu ayar, sadece belirli isimlere sahip senaryoların çalıştırılmasını sağlar.
+
+"rerun": "@rerun.txt": Bu ayar, başarısız olan testlerin hangi dosyaya yazılacağını belirtir. Bu dosya daha sonra cucumber @rerun.txt komutu ile çalıştırılabilir.
+
+  "parallel": 1,
+  "tagExpression": "not @ignore",
+  "profile": false,
+
+-----------------------------------
+
+Cucumber yapılandırma dosyasında en sık kullanılan ve genellikle en gerekli olan özellikler şunlardır:
+
+"paths": Bu, Cucumber'ın hangi klasörlerdeki .feature dosyalarını çalıştıracağını belirtir. Bu, genellikle testlerin bulunduğu klasörü belirtmek için kullanılır.
+
+"format": Bu, test sonuçlarının nasıl biçimlendirileceğini belirtir. 
+
+"tags": Bu, hangi etiketlere sahip testlerin çalıştırılacağını veya çalıştırılmayacağını belirtir. Bu, belirli testleri hedeflemek veya dışlamak için kullanılır.
+
+"require": Bu, Cucumber'ın hangi dosyaları veya klasörleri gerektireceğini belirtir. Bu dosyalar genellikle adım tanımlarını içerir.
+
+"strict": Bu, Cucumber'ın testlerin başarısız olması durumunda nasıl davranacağını belirtir. strict modda, Cucumber bir test başarısız olduğunda hemen durur.
+
+"dry-run": Bu, Cucumber'ın testleri gerçekten çalıştırıp çalıştırmayacağını belirtir. dry-run modunda, Cucumber testleri gerçekten çalıştırmaz, sadece testlerin tanımlarını kontrol eder.
+
+Bu özellikler, bir Cucumber yapılandırma dosyasında genellikle bulunur ve en sık kullanılır. Ancak, hangi özelliklerin sizin için en gerekli olduğu, projenizin ihtiyaçlarına bağlıdır.
+
+
+dry-run : true --> olduğu zaman testleri koşmayacak sadece projeyi tarayacak eksik bir adım varmı diye kontrol
+
+
+
+***************************************************
+"formatOptions": {
+  "snippetInterface": "async-await",
+  "colorsEnabled": true,
+  "indentation": 2
+},  
+
+
+"snippetInterface": "async-await": Bu, Cucumber'ın adım tanımlarını oluştururken hangi arayüzü kullanacağını belirtir. "async-await" seçeneği, modern JavaScript'te asenkron işlemleri yönetmek için kullanılan bir yapıdır. Bu, adım tanımlarınızın asenkron fonksiyonlar olarak oluşturulacağı anlamına gelir.
+
+"colorsEnabled": true: Bu, terminal çıktısında renklerin kullanılıp kullanılmayacağını belirtir. true olarak ayarlandığında, başarılı adımlar yeşil, başarısız adımlar kırmızı ve atlanan adımlar sarı olarak görüntülenir.
+
+"indentation": 2: Bu, oluşturulan adım tanımlarının girinti seviyesini belirtir. Bu özellik, kodunuzun okunabilirliğini artırmak için kullanılır. Bu örnekte, her seviye için iki boşluk girinti kullanılır.
+
+
+*******************************************************************
+
+*******************************************************
+{
+  "default": {
+    "paths": ["src/test/features"],
+    "format": ["summary"],
+    "tags": "~@ignore",
+    "dryRun": true
+  }
+}
+
+
+ aşağıda belirtilen formatların her biri Cucumber test sonuçlarını farklı bir şekilde görüntüler:
+
+progress: Bu format, test sonuçlarını çok minimal bir biçimde görüntüler. Her test senaryosu için tek bir karakter görüntüler: başarılı adımlar için bir nokta (.), başarısız adımlar için bir F (F), beklenmeyen hatalar için bir H (H) ve atlanan adımlar için bir N (N). Bu format, genellikle birçok testi hızlı bir şekilde çalıştırırken ve sadece genel bir ilerleme göstergesi istediğinizde kullanılır.
+
+summary: Bu format, test sonuçlarını daha ayrıntılı bir biçimde görüntüler. Her test senaryosu ve adımı için ayrıntılı bilgiler sağlar, başarılı ve başarısız testlerin sayısını ve test süresini içerir.
+
+message: Bu format, test sonuçlarını Protobuf mesajları olarak görüntüler. Bu, genellikle test sonuçlarını başka bir araca aktarmak veya sonuçları daha sonra işlemek için kullanılır.
+
+Bu formatları, Cucumber yapılandırma dosyanızdaki format seçeneğinde belirtirsiniz. Örneğin, summary formatını kullanmak isterseniz, yapılandırma dosyanızı şu şekilde güncelleyebilirsiniz:
+
+
+
+
+------------------------------------
+cucumber.json : 
+
+{
+  "default": {
+    "tags": "@register or @smoke",   ----> bu şekilde istediğimiz tagları çalışrırız
+    "formatOptions": {
+      "snippetInterface": "async-await"
+    },
+    "paths": ["src/test/features"],
+    "dryRun": false,
+    "require": ["src/test/steps/**/*.ts", "src/hooks/hooks.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "progress-bar",          --->  bu consolda testlerin geçip geçmediğini farklı şekilde gösteriyor, consol çıktısı ile alakalı
+                               --->  buranın defaultu progress 
+                               --->  summary daha sadece
+                               -->   progress-bar daha farklı ama iyi değil
+                         
+      "html:test-results/cucumber-report.html",
+      "json:test-results/cucumber-report.json",
+       "rerun:test-results/@rerun.txt"  ---> test fail olursa test-results klasörünün altına @rerun@.txt adında dosya oluşturur 
+                                        ---> bu txt dosyası ile bu fail olan testleri tekrar koşabilirz
+    ], 
+    "parallel" : 2  --> testler ikişer ikişser çalışır , aynı anda 2 browser açar
+                    --> paralel testler birbirinden bağımsız olmalı , bağımlı olan testler paralel olarak koşulmamalı
+ } ,
+
+  "rerun": {                             ---->> rerun adında yeni bir profil ekledik 
+    "formatOptions": {
+      "snippetInterface": "async-await"
+    },
+    "dryRun": false,
+    "require": ["src/test/steps/**/*.ts", "src/hooks/hooks.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "html:test-results/cucumber-report.html",
+      "json:test-results/cucumber-report.json",
+      "rerun:test-results/rerun.txt"
+    ],
+    "parallel": 2
+  },
+}
+
+
+
+
+
+
+
+
+
+*********************************************************************************************
+
+package.json :  
+
+
+{
+  "name": "playwright---cucumber-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js test",
+    "test:failed": "cucumber-js test -p rerun @rerun.txt"   ---> bu sayede  cucumber.json daki  rerun profilindeki scripti 
+                                                                  çalıştırır sadece , yani böylece sadece fail olan testlerimizi  
+                                                                   çalışrmış oluruz
+                                                                  -p rerun  -->  diyerek rerun adlı profili seçiyoruz
+                                                              
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.8.0",
+    "@playwright/test": "^1.44.1",
+    "@types/node": "^20.14.0",
+    "ts-node": "^10.9.2"
+  }
+}
+
+******************************************************************************
+
+npm run komutu, package.json dosyasındaki scripts bölümünde tanımlanan özel script'leri çalıştırmak için kullanılır.
+npm test komutu, scripts bölümünde test adında bir script olduğunda, bu script'i çalıştırır. 
+Bu, npm tarafından önceden tanımlanmış bir kısayoldur ve aslında npm run test komutunun kısaltılmış halidir
+
+
+*****************************
+
+config klasörünün altında  > cucumber.js adınd bir dosya oluşturduk
+
+script çalıştırmak için istersek cucummber.js istersek package.json kullanabiliriz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*******************************
+
+
+
+
+
+
+
+
+
+
+
+
+Playwright gibi test çerçevelerinde asenkron işlemlerin kullanılmasının temel nedeni, gerçek dünya web tarayıcılarının davranışlarını simüle etmek ve testlerin daha hızlı ve verimli çalışmasını sağlamaktır.
+
+Neden Asenkron İşlemler?
+
+Web Tarayıcılarının Doğası: Web tarayıcıları, sayfa yükleme, JavaScript çalıştırma, ağ istekleri gönderme gibi birçok işlemi asenkron olarak gerçekleştirir. Playwright, bu asenkron davranışı taklit ederek tarayıcıyla gerçekçi bir etkileşim kurar.
+Zaman Alan İşlemler: Bir web sayfasının yüklenmesi, özellikle görseller, stiller ve scriptler içeren karmaşık sayfalarda, belirli bir süre alabilir. Aynı şekilde, bir form gönderme veya bir butona tıklama gibi kullanıcı etkileşimleri de anında sonuç vermeyebilir. Asenkron işlemler, bu tür zaman alan işlemlerin test akışını bloke etmeden devam etmesini sağlar.
+Paralellik: Asenkron işlemler, birden fazla test senaryosunun veya işleminin aynı anda çalışmasına olanak tanır. Bu, test sürecini hızlandırır ve kaynakları daha verimli kullanır. Örneğin, bir test senaryosu bir sayfanın yüklenmesini beklerken, başka bir senaryo farklı bir sayfada testler gerçekleştirebilir.
+Testlerin Doğruluğu: Web uygulamaları genellikle asenkron olarak güncellenir. Örneğin, bir butona tıklandığında, sayfa içeriği anında değişmeyebilir. Asenkron işlemler, bu tür güncellemelerin tamamlanmasını bekleyerek testlerin doğru sonuçlar üretmesini sağlar.
+Playwright'te Asenkron İşlemler Nasıl Kullanılır?
+
+Playwright, asenkron işlemler için async/await yapısını kullanır. Bu yapı, asenkron kodun daha okunabilir ve anlaşılır olmasını sağlar. Örneğin:
+
+
+Asenkron programlama, JavaScript'te zaman alıcı işlemleri yönetmenin bir yoludur. Asenkron bir fonksiyon, işlem tamamlanana kadar bekler (yani "asenkron" bekler), ancak bu süre zarfında diğer kodların çalışmasına izin verir. Bu, JavaScript'in tek iş parçacıklı (single-threaded) doğasını dikkate alarak, uygulamanın yanıt vermesini sağlar.
+
+Örneğin, bir ağ isteği gönderdiğinizi düşünün. Bu istek birkaç saniye sürebilir. Eğer bu işlemi senkron bir şekilde gerçekleştirirseniz, istek tamamlanana kadar uygulamanızın geri kalanı durur. Bu, kullanıcı deneyimi açısından ideal değildir.
+
+Bunun yerine, isteği asenkron bir şekilde gönderirseniz, istek tamamlanana kadar beklerken diğer kodlarınızın çalışmasına izin verir. Bu, uygulamanızın yanıt vermesini sağlar ve genellikle daha iyi bir kullanıcı deneyimi sunar.
+
+Bu nedenle, "beklemek" gerektiğinde genellikle asenkron programlama kullanılır. "Beklemek" derken, aslında "işlem tamamlanana kadar diğer işlemlere devam etmek" anlamına gelir. Bu, asenkron programlamanın temel felsefesidir.
+
+
+
+Asenkron programlama, JavaScript'te çok yaygın bir paradigmadır. Asenkron fonksiyonlar, belirli bir işlemin tamamlanmasını beklemek zorunda kalmadan diğer işlemlere devam etmemizi sağlar. Bu, özellikle ağ istekleri, dosya okuma/yazma işlemleri, veritabanı sorguları gibi zaman alıcı işlemler için önemlidir.
+
+Cucumber'da, adımlarınızın asenkron olması genellikle iki sebepten dolayı gereklidir:
+
+Ağ İstekleri: Eğer adımlarınız ağ istekleri yapıyorsa (örneğin, bir API'ye istek göndermek), bu isteklerin tamamlanmasını beklemek zorundasınızdır. Asenkron fonksiyonlar ve await anahtar kelimesi, bu isteklerin tamamlanmasını beklemenizi sağlar.
+
+Tarayıcı Otomasyonu: Eğer Cucumber'ı bir tarayıcı otomasyon aracıyla (örneğin, Selenium veya Puppeteer) birlikte kullanıyorsanız, tarayıcıdaki işlemlerin tamamlanmasını beklemeniz gerekebilir. Örneğin, bir sayfanın yüklenmesini veya bir elementin görünür olmasını beklemek gibi.
+
+Bu nedenle, Cucumber adımlarınızı asenkron olarak tanımlamak, bu tür zaman alıcı işlemleri daha kolay yönetmenizi sağlar.
+
+
+import { chromium } from 'playwright';
+
+(async () => {
+  const browser = await chromium.launch(); // Tarayıcı başlatma (asenkron)
+  const page = await browser.newPage(); // Yeni sayfa açma (asenkron)
+
+  await page.goto('https://example.com'); // Sayfa yükleme (asenkron)
+  await page.click('button[type="submit"]'); // Butona tıklama (asenkron)
+
+  // ... diğer işlemler
+
+  await browser.close(); // Tarayıcı kapatma (asenkron)
+})();
+
+
+
+Playwright gibi test çerçevelerinde asenkron işlemlerin kullanılmasının temel nedeni, gerçek dünya web tarayıcılarının davranışlarını simüle etmek ve testlerin daha hızlı ve verimli çalışmasını sağlamaktır.
+
+Neden Asenkron İşlemler?
+
+Web Tarayıcılarının Doğası: Web tarayıcıları, sayfa yükleme, JavaScript çalıştırma, ağ istekleri gönderme gibi birçok işlemi asenkron olarak gerçekleştirir. Playwright, bu asenkron davranışı taklit ederek tarayıcıyla gerçekçi bir etkileşim kurar.
+Zaman Alan İşlemler: Bir web sayfasının yüklenmesi, özellikle görseller, stiller ve scriptler içeren karmaşık sayfalarda, belirli bir süre alabilir. Aynı şekilde, bir form gönderme veya bir butona tıklama gibi kullanıcı etkileşimleri de anında sonuç vermeyebilir. Asenkron işlemler, bu tür zaman alan işlemlerin test akışını bloke etmeden devam etmesini sağlar.
+Paralellik: Asenkron işlemler, birden fazla test senaryosunun veya işleminin aynı anda çalışmasına olanak tanır. Bu, test sürecini hızlandırır ve kaynakları daha verimli kullanır. Örneğin, bir test senaryosu bir sayfanın yüklenmesini beklerken, başka bir senaryo farklı bir sayfada testler gerçekleştirebilir.
+Testlerin Doğruluğu: Web uygulamaları genellikle asenkron olarak güncellenir. Örneğin, bir butona tıklandığında, sayfa içeriği anında değişmeyebilir. Asenkron işlemler, bu tür güncellemelerin tamamlanmasını bekleyerek testlerin doğru sonuçlar üretmesini sağlar.
+Playwright'te Asenkron İşlemler Nasıl Kullanılır?
+
+Playwright, asenkron işlemler için async/await yapısını kullanır. Bu yapı, asenkron kodun daha okunabilir ve anlaşılır olmasını sağlar. Örneğin:
+
+JavaScript
+import { chromium } from 'playwright';
+
+(async () => {
+  const browser = await chromium.launch(); // Tarayıcı başlatma (asenkron)
+  const page = await browser.newPage(); // Yeni sayfa açma (asenkron)
+
+  await page.goto('https://example.com'); // Sayfa yükleme (asenkron)
+  await page.click('button[type="submit"]'); // Butona tıklama (asenkron)
+
+  // ... diğer işlemler
+
+  await browser.close(); // Tarayıcı kapatma (asenkron)
+});
+
+
+Bu örnekte, her bir adım bir önceki adımın tamamlanmasını await anahtar kelimesiyle bekler. Bu sayede test senaryosu, tarayıcının asenkron davranışına uyum sağlar ve doğru sonuçlar üretir.
+
+Özetle: Playwright gibi test çerçevelerinde asenkron işlemler, gerçekçi web tarayıcı davranışlarını simüle etmek, testleri hızlandırmak, paralellik sağlamak ve testlerin doğruluğunu artırmak için kullanılır. Bu, daha kapsamlı ve güvenilir test senaryoları oluşturmaya olanak tanır
+
+
+*******************************************************************
+
+Arrow fonksiyonlar ve function anahtar kelimesi ile oluşturulan fonksiyonlar arasında bazı önemli farklar vardır. Bu farklar, hangi tür fonksiyonun kullanılacağını belirler.
+
+Arrow fonksiyonlar, this anahtar kelimesini lexical olarak bağlar, yani this anahtar kelimesi, arrow fonksiyonun tanımlandığı yerdeki this değerine karşılık gelir. Bu, özellikle callback fonksiyonlarında veya event handlerlarda kullanışlıdır.
+
+function anahtar kelimesi ile oluşturulan fonksiyonlar ise, this anahtar kelimesini dinamik olarak bağlar. Bu, this anahtar kelimesinin fonksiyonun çağrıldığı nesneye karşılık gelmesi anlamına gelir.
+
+Cucumber.js'de, genellikle function anahtar kelimesi ile oluşturulan fonksiyonlar kullanılır çünkü Cucumber, this anahtar kelimesini kullanarak adım tanımlamalarına çeşitli yardımcı işlevler ve özellikler ekler. Arrow fonksiyonlar kullanıldığında, bu özelliklere erişilemez.
+
+Bu nedenle, Cucumber.js adımlarını tanımlarken genellikle function anahtar kelimesi ile oluşturulan fonksiyonlar kullanılır. Ancak, belirli bir durumda arrow fonksiyonların kullanılması daha uygunsa, arrow fonksiyonlar da kullanılabilir.
+
+
+
+*******************************************************
+bizim bir tane page objesi ile çalışmamız gerekiyor, bir adımda başka bi page ikinci adımda başka bi page felan çalışamaz, 
+bir browser açıldığı zaman bir test için mutlaka bir page kullanması gerekiyor
+
+
+
+

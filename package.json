@@ -1,0 +1,21 @@
+{
+  "name": "playwright---cucumber-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js test",
+    "test:failed": "cucumber-js test -p rerun @rerun.txt",
+    "register": "npm test --tags=\"@register\"",
+    "smoke": "npm test --tags=\"@smoke\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.8.0",
+    "@playwright/test": "^1.44.1",
+    "@types/node": "^20.14.0",
+    "ts-node": "^10.9.2"
+  }
+}
